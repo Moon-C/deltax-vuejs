@@ -11,6 +11,7 @@ export default new Router({
       path: '/',
       name: 'listings',
       component: Listings,
+      props: true
     },
     {
       path: '/add',

@@ -138,13 +138,15 @@ export default {
           axios.post('/movies', json)
           .then(res => {
               console.log(res);
-              self.$router.push({name: 'listings'});
+              self.$router.push({name: 'listings', params: 
+              { paramAlert: true, paramAlertText: "'"+json.name+"' has been added to listings." }});
           });
         } else {
           axios.put('/movies/'+self.id, json)
           .then(res => {
               console.log(res);
-              self.$router.push({name: 'listings'});
+              self.$router.push({name: 'listings', params: 
+              { paramAlert: true, paramAlertText: "Details for '"+json.name+"' has been modified." }});
           });
         }
 

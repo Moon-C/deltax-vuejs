@@ -1,5 +1,12 @@
 <template>
   <div class="container">
+
+    <transition name="fade">
+      <div id="movieAlert" v-if="showAlert" class="alert alert-primary" role="alert">
+        {{ alertText }}
+      </div>
+    </transition>
+
     <table class="table table-striped">
       <thead>
         <tr>
@@ -33,20 +40,41 @@ import axios from 'axios'
 
 export default {
   name: 'listings',
+  props: ['paramAlert', 'paramAlertText'],
   data() {
     return {
+      showAlert: false,
+      alertText: '',
       movies: []
     }
   },
   methods: {
+    hideAlert: function() {
+      let self = this;
+      setTimeout(function(){ 
+          self.showAlert = false;
+      }, 5000);
+    },
     deleteMovie: function(movieID, movieIndex) {
       let self = this;
       axios.delete('/movies/'+movieID)
-      .then(self.movies.splice(movieIndex, 1))
+      .then(res => {
+        let movieName = self.movies[movieIndex].name;
+        self.movies.splice(movieIndex, 1);
+        self.showAlert = true;
+        self.alertText = "'"+movieName+"' was deleted from listings.";
+        self.hideAlert();
+      })
       .catch(error => console.log(error));      
     }
   },
   mounted() {
+
+    // Checking for alerts
+    if(this.paramAlert) {
+      this.showAlert = this.paramAlert;
+      this.alertText = this.paramAlertText;
+    }
 
     // Fetch movie listings
     let self = this;
@@ -83,6 +111,9 @@ export default {
 
     })
     .catch(error => console.log(error));
+    
+    if(this.showAlert)
+      this.hideAlert();
   }
 }
 </script>
