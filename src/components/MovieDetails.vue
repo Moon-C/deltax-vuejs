@@ -1,85 +1,141 @@
 <template>
 
-    <form class="entryForm">
-      <slot name=legend />
+  <form class="entry-form">
+    <slot name=legend />
 
-      <fieldset class="form-group">
-        
-        <div class="form-group row align-items-center">
-          <label class="col-sm-2 col-form-label" for="name">Movie Name</label>
-          <div class="col-sm-10">
-            <input type="text" id="name" class="form-control" v-model="movieDetails.name" />
+    <fieldset class="form-group">
+
+      <div class="form-group row align-items-center">
+        <label class="col-sm-2 col-form-label" for="name">Movie Name</label>
+        <div class="col-sm-10">
+          <input type="text" id="name" class="form-control" v-model.trim="$v.movieDetails.name.$model" />
+          <div class="invalid-feedback" v-if="!$v.movieDetails.name.required && $v.movieDetails.name.$dirty">
+            Please enter a valid name!
           </div>
         </div>
+      </div>
 
-        <div class="form-group row align-items-center">
-          <label class="col-sm-2 col-form-label"  for="year">Release Date</label>
-          <div class="col-sm-10">
-            <input type="text" id="year" class="form-control" v-model="movieDetails.yearOfRelease" />
+      <div class="form-group row align-items-center">
+        <label class="col-sm-2 col-form-label"  for="year">Release Date</label>
+        <div class="col-sm-10">
+          <input type="text" id="year" class="form-control" v-model.trim.lazy="$v.movieDetails.yearOfRelease.$model" />
+          <div class="invalid-feedback" v-if="!$v.movieDetails.yearOfRelease.validDate && $v.movieDetails.yearOfRelease.$dirty">
+            Please enter a valid date! (dd/mm/yyyy)
           </div>
         </div>
+      </div>
 
-        <div class="form-group row align-items-center">
-          <label class="col-sm-2 col-form-label"  for="plot">Plot</label>
-          <div class="col-sm-10">
-            <textarea id="plot" class="form-control" v-model="movieDetails.plot" />
-          </div>
+      <div class="form-group row align-items-center">
+        <label class="col-sm-2 col-form-label"  for="plot">Plot</label>
+        <div class="col-sm-10">
+          <textarea id="plot" class="form-control" v-model="movieDetails.plot" />
         </div>
+      </div>
 
-        <div class="form-group row align-items-center">
-          <label class="col-sm-2 col-form-label"  for="posterUrl">Poster URL</label>
-          <div class="col-sm-10">
-            <input type="text" id="posterUrl" class="form-control" v-model="movieDetails.poster" />
-          </div>
+      <div class="form-group row align-items-center">
+        <label class="col-sm-2 col-form-label"  for="posterUrl">Poster URL</label>
+        <div class="col-sm-10">
+          <input type="text" id="posterUrl" class="form-control" v-model="movieDetails.poster" />
         </div>
+      </div>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label"  for="producers">Producers</label>
-          <div class="col-sm-10">
-            <select id="producers" class="form-control" v-model="movieDetails.producer">
-              <option v-for="producer in Object.values(producerMap)" :key="producer.id" :value="producer.id">{{ producer.name }}</option>
-            </select>
-            <p><a @click.prevent="$emit('switchComponent', {name: 'person-details', mode: 'new-producer'})" href="">+ Add Producer</a></p>
-          </div>
-        </div>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label"  for="producers">Producers</label>
+        <div class="col-sm-10">
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label"  for="actors">Actors</label>
-          <div class="col-sm-10">
-            <multiselect id="actors" v-model="movieDetails.actors" placeholder="Search or add actor" label="name" track-by="name" 
-            :options="Object.values(actorMap)" :multiple="true" :clearOnSelect="true" :hideSelected="true" openDirection="below"></multiselect>
-            <p><a @click.prevent="$emit('switchComponent', {name: 'person-details', mode: 'new-actor'})" href="">+ Add Actor</a></p>
-          </div>
-        </div>
+          <select 
+          id="producers"
+          class="form-control"
+          v-model="$v.movieDetails.producer.$model">
+          <option
+          v-for="producer in Object.values(producerMap)" 
+          :key="producer.id" 
+          :value="producer.id">{{ producer.name }}
+        </option>
+      </select>
 
-        <div class="form-group">
-          <button class="btn btn-primary" type="button" @click="submitRequest()">Submit</button>
-        </div>
-      </fieldset>
-    </form>
+      <div><b-link
+        @click="$emit('switchComponent', {name: 'person-details', mode: 'new-producer'})"
+        href="#">
+        + Add Producer
+      </b-link></div>
+
+      <div class="invalid-feedback" v-if="!$v.movieDetails.producer.required && $v.movieDetails.producer.$dirty">
+        Please select a producer
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label"  for="actors">Actors</label>
+    <div class="col-sm-10">
+
+      <multiselect
+      id="actors" 
+      v-model="$v.movieDetails.actors.$model" 
+      placeholder="Search or add actor" 
+      label="name" 
+      track-by="name" 
+      :options="Object.values(actorMap)" 
+      :multiple="true" 
+      :clearOnSelect="true" 
+      :hideSelected="true" 
+      openDirection="below">
+    </multiselect>
+
+    <div><b-link 
+      @click="$emit('switchComponent', {name: 'person-details', mode: 'new-actor'})" 
+      href="#">
+      + Add Actor
+    </b-link></div>
+
+    <div class="invalid-feedback" v-if="!$v.movieDetails.actors.required && $v.movieDetails.actors.$dirty">
+      Minimum one actor must be selected
+    </div>
+
+  </div>
+</div>
+
+<div class="form-group">
+  <button class="btn btn-primary" type="button" @click="submitRequest()">Submit</button>
+</div>
+</fieldset>
+</form>
 
 </template>
 
 <script>
 
-import axios from 'axios'
-import Multiselect from 'vue-multiselect'
+  import axios from 'axios'
+  import Multiselect from 'vue-multiselect'
+  import { required } from 'vuelidate/lib/validators'
 
-export default {
+  const validDate = (date) => date.search(/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/) === 0
+
+  export default {
+    props: ['producerID','actorID'],
     data() {
-        return {
-          id: this.$route.params.id,
-          movieDetails: {
-            name: '',
-            yearOfRelease: '',
-            plot: '',
-            poster: '',
-            producer: '',
-            actors: []
-          },
-          producerMap: {},
-          actorMap: {}
-        }
+      return {
+        id: this.$route.params.id,
+        movieDetails: {
+          name: '',
+          yearOfRelease: '',
+          plot: '',
+          poster: '',
+          producer: '',
+          actors: []
+        },
+        producerMap: {},
+        actorMap: {}
+      }
+    },
+    validations: {
+      movieDetails: {
+        name: { required },
+        yearOfRelease: { validDate },
+        producer: { required },
+        actors: { required }
+      }
     },
     methods: {
       generateProducerMap: function() {
@@ -93,6 +149,9 @@ export default {
             (map[producer.id] = {id: producer.id, name: producer.name}, map), {});
 
           self.producerMap = producerMap;
+
+          if(self.producerID !== undefined)
+            self.movieDetails.producer = self.producerID; 
 
         })
         .catch(error => console.log(error));
@@ -108,8 +167,11 @@ export default {
             (map[actor.id] = {id: actor.id, name: actor.name}, map), {});
 
           self.actorMap = actorMap;
-          if(self.id !== undefined)
+          if(!isNaN(self.movieDetails.actors[0]))
             self.loadActorDetails();
+
+          if(self.actorID !== undefined)
+            self.movieDetails.actors.push(self.actorMap[self.actorID]);
 
         })
         .catch(error => console.log(error));
@@ -122,10 +184,10 @@ export default {
         .catch(error => console.log(error));
       },
       loadActorDetails: function() {
-          let actors = [];
-          this.movieDetails.actors.forEach(actorID =>
-            actors.push({ id: this.actorMap[actorID].id, name: this.actorMap[actorID].name }));
-          this.movieDetails.actors = actors;
+        let actors = [];
+        this.movieDetails.actors.forEach(actorID =>
+          actors.push({ id: this.actorMap[actorID].id, name: this.actorMap[actorID].name }));
+        this.movieDetails.actors = actors;
       },
       submitRequest: function() {
 
@@ -134,28 +196,29 @@ export default {
         console.log(json);
 
         let self = this;
-        if(self.id === undefined) {
-          axios.post('/movies', json)
-          .then(res => {
+        self.$v.$touch();
+        if(!self.$v.$invalid) {
+          if(self.id === undefined) {
+            axios.post('/movies', json)
+            .then(res => {
               console.log(res);
               self.$router.push({name: 'listings', params: 
-              { paramAlert: true, paramAlertText: "'"+json.name+"' has been added to listings." }});
-          });
-        } else {
-          axios.put('/movies/'+self.id, json)
-          .then(res => {
+                { paramAlert: true, paramAlertText: "'"+json.name+"' has been added to listings." }});
+            });
+          } else {
+            axios.put('/movies/'+self.id, json)
+            .then(res => {
               console.log(res);
               self.$router.push({name: 'listings', params: 
-              { paramAlert: true, paramAlertText: "Details for '"+json.name+"' has been modified." }});
-          });
+                { paramAlert: true, paramAlertText: "Details for '"+json.name+"' has been modified." }});
+            });
+          }
         }
-
       }
     },
     created() {
       if(this.id !== undefined)
         this.fetchMovieDetails();
-      this.generateProducerMap();
       this.generateActorMap();
     },
     activated() {
@@ -165,5 +228,5 @@ export default {
     components: {
       multiselect: Multiselect
     }
-}
+  }
 </script>

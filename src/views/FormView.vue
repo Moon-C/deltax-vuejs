@@ -44,8 +44,12 @@ export default {
   methods: {
     switchComponent: function(component) {
       this.selectedComponent = component.name;
-      if(component.name === 'movie-details')
-        this.currentProps = {};
+      if(component.name === 'movie-details') {
+        if(component.producerID !== undefined)
+          this.currentProps = {producerID: component.producerID};
+        if(component.actorID !== undefined)
+          this.currentProps = {actorID: component.actorID};
+      }
       else
         this.currentProps = {mode: component.mode};
     }
@@ -62,7 +66,7 @@ export default {
 
 <style>
 
-.entryForm {
+.entry-form {
   max-width: 600px;
   margin: auto;
   margin-bottom: 20px;
@@ -70,6 +74,10 @@ export default {
   padding-bottom: 0px;
   border: 1px solid #888;
   border-radius: 10px;
+}
+
+.invalid-feedback {
+  display: block !important;
 }
 
 /* .btn-primary {
