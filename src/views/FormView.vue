@@ -1,5 +1,5 @@
 <template>
-  <div :key="$router.currentRoute.name" class="container">
+  <div class="container">
 
     <keep-alive>
       <component :is="selectedComponent" @switchComponent="switchComponent($event)" v-bind="currentProps">

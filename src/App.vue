@@ -4,7 +4,7 @@
       <router-link tag="button" class="btn btn-primary" to="/">Listings</router-link>
       <router-link tag="button" class="btn btn-primary" to="/add">Add Entry</router-link>
     </div>
-    <router-view/>
+    <router-view :key="$route.fullPath" />
   </div>
 </template>
 
