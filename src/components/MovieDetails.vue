@@ -167,8 +167,8 @@
             (map[actor.id] = {id: actor.id, name: actor.name}, map), {});
 
           self.actorMap = actorMap;
-          if(!isNaN(self.movieDetails.actors[0]))
-            self.loadActorDetails();
+          if(self.id !== undefined && self.movieDetails.actors.length === 0)
+            self.fetchMovieDetails();
 
           if(self.actorID !== undefined)
             self.movieDetails.actors.push(self.actorMap[self.actorID]);
@@ -180,7 +180,10 @@
         let self = this;
 
         axios.get('/movies/'+self.id)
-        .then(res => self.movieDetails = res.data)
+        .then(res => {
+          self.movieDetails = res.data;
+          self.loadActorDetails();
+        })
         .catch(error => console.log(error));
       },
       loadActorDetails: function() {
@@ -215,11 +218,6 @@
           }
         }
       }
-    },
-    created() {
-      if(this.id !== undefined)
-        this.fetchMovieDetails();
-      this.generateActorMap();
     },
     activated() {
       this.generateProducerMap();
