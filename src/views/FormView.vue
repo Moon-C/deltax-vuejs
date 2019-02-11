@@ -1,8 +1,12 @@
 <template>
   <div class="container">
 
+  <b-alert id="serverAlert" :show="serverError" variant="danger" dismissible fade>There was a problem connecting to the server. 
+  Retry or <b-link href="#" @click="$router.go()">click here</b-link> to refresh.</b-alert>
+
     <keep-alive>
-      <component :is="selectedComponent" @switchComponent="switchComponent($event)" v-bind="currentProps">
+      <component :is="selectedComponent"
+       @switchComponent="switchComponent($event)" @serverError="serverError = true" v-bind="currentProps">
         <legend slot="legend">{{ heading }}</legend>
       </component>
     </keep-alive>
@@ -13,7 +17,6 @@
 
 <script>
 
-import axios from 'axios'
 import MovieDetails from '../components/MovieDetails.vue'
 import PersonDetails from '../components/PersonDetails.vue'
 
@@ -22,7 +25,7 @@ export default {
     return {
       selectedComponent: 'movie-details',
       currentProps: {},
-      refresh: true
+      serverError: false
     }
   },
   computed: {

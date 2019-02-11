@@ -139,6 +139,10 @@
             }
             if(self.mode === 'new-actor')
               self.$emit('switchComponent', {name: 'movie-details', actorID: res.data.id});
+          })
+          .catch(error => {
+            console.log(error);
+            self.$emit('serverError');
           });
         }
       }
@@ -158,7 +162,10 @@
 
         self.movieMap = movieMap;
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        console.log(error);
+        self.$emit('serverError');
+      });
     },
     deactivated() {
       this.personDetails.name = '';

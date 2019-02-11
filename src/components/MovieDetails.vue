@@ -154,7 +154,10 @@
             self.movieDetails.producer = self.producerID; 
 
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+          self.$emit('serverError');
+        });
       },
       generateActorMap: function() {
         let self = this;
@@ -174,7 +177,10 @@
             self.movieDetails.actors.push(self.actorMap[self.actorID]);
 
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+          self.$emit('serverError');
+        });
       },
       fetchMovieDetails: function() {
         let self = this;
@@ -184,7 +190,10 @@
           self.movieDetails = res.data;
           self.loadActorDetails();
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+          self.$emit('serverError');
+        });
       },
       loadActorDetails: function() {
         let actors = [];
@@ -207,6 +216,10 @@
               console.log(res);
               self.$router.push({name: 'listings', params: 
                 { paramAlert: true, paramAlertText: "'"+json.name+"' has been added to listings." }});
+            })
+            .catch(error => {
+              console.log(error);
+              self.$emit('serverError');
             });
           } else {
             axios.put('/movies/'+self.id, json)
@@ -214,6 +227,10 @@
               console.log(res);
               self.$router.push({name: 'listings', params: 
                 { paramAlert: true, paramAlertText: "Details for '"+json.name+"' has been modified." }});
+            })
+            .catch(error => {
+              console.log(error);
+              self.$emit('serverError');
             });
           }
         }

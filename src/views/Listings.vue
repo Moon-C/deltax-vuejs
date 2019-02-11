@@ -5,6 +5,9 @@
       {{ alertText }}
     </b-alert>
 
+    <b-alert id="serverAlert" :show="serverError" variant="danger" dismissible fade>There was a problem connecting to the server. 
+      Retry or <b-link href="#" @click="$router.go()">click here</b-link> to refresh.</b-alert>
+
     <b-modal id="movieDetailsDialog" :title="selectedMovie.name" :ok-only="true" footer-class="py-1" >
       <b-container>
         <b-row>
@@ -50,6 +53,7 @@ export default {
   data() {
     return {
       showAlert: false,
+      serverError: false,
       alertText: '',
       deleteParameters: {
         movieID: '',
@@ -85,7 +89,10 @@ export default {
         self.alertText = "'"+movieName+"' was deleted from listings.";
         self.hideAlert();
       })
-      .catch(error => console.log(error));      
+      .catch(error => {
+        console.log(error);
+        self.serverError = true;
+      });      
     }
   },
   mounted() {
@@ -115,7 +122,10 @@ export default {
           self.movies[index].producer = producerMap[movie.producer].name);
 
       })
-      .catch(error => console.log(error));
+      .catch(error =>{
+        console.log(error);
+        self.serverError = true;
+      }); 
 
       // Fetch and map actors
       axios.get('/actors')
@@ -131,11 +141,17 @@ export default {
         });
 
       })
-      .catch(error => console.log(error));
-      
+      .catch(error => {
+        console.log(error);
+        self.serverError = true;
+      }); 
+
     })
-    .catch(error => console.log(error));
-    
+    .catch(error => {
+        console.log(error);
+        self.serverError = true;
+    }); 
+
     if(this.showAlert)
       this.hideAlert();
   }
