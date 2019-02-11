@@ -3,6 +3,12 @@
   <form class="entry-form">
     <slot name=legend />
 
+    <b-modal id="personDialog" :hide-header="true" :hide-footer="true">
+      <person-details @switchComponent="recreate($event)" :mode="mode">
+        <legend slot="legend">{{ heading }}</legend>
+      </person-details>
+    </b-modal>
+
     <fieldset class="form-group">
 
       <div class="form-group row align-items-center">
@@ -54,11 +60,7 @@
         </option>
       </select>
 
-      <div><b-link
-        @click="$emit('switchComponent', {name: 'person-details', mode: 'new-producer'})"
-        href="#">
-        + Add Producer
-      </b-link></div>
+      <div><b-link v-b-modal.personDialog href="#" @click="mode = 'new-producer'">+ Add Producer</b-link></div>
 
       <div class="invalid-feedback" v-if="!$v.movieDetails.producer.required && $v.movieDetails.producer.$dirty">
         Please select a producer
@@ -83,11 +85,7 @@
       openDirection="below">
     </multiselect>
 
-    <div><b-link 
-      @click="$emit('switchComponent', {name: 'person-details', mode: 'new-actor'})" 
-      href="#">
-      + Add Actor
-    </b-link></div>
+    <div><b-link v-b-modal.personDialog href="#" @click="mode = 'new-actor'">+ Add Actor</b-link></div>
 
     <div class="invalid-feedback" v-if="!$v.movieDetails.actors.required && $v.movieDetails.actors.$dirty">
       Minimum one actor must be selected
@@ -109,6 +107,8 @@
   import axios from 'axios'
   import Multiselect from 'vue-multiselect'
   import { required } from 'vuelidate/lib/validators'
+  
+import PersonDetails from '../components/PersonDetails.vue'
 
   const validDate = (date) => date.search(/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/) === 0
 
@@ -126,7 +126,16 @@
           actors: []
         },
         producerMap: {},
-        actorMap: {}
+        actorMap: {},
+        mode: ''
+      }
+    },
+    computed: {
+      heading: function() {
+        if(this.mode === 'new-producer')
+          return 'Add New Producer'
+        if(this.mode === 'new-actor')
+          return 'Add New Actor'
       }
     },
     validations: {
@@ -192,6 +201,11 @@
           actors.push({ id: this.actorMap[actorID].id, name: this.actorMap[actorID].name }));
         this.movieDetails.actors = actors;
       },
+      recreate: function(event) {
+          this.$emit('switchComponent', event);
+          this.generateProducerMap();
+          this.generateActorMap();
+      },
       submitRequest: function() {
 
         let json = JSON.parse(JSON.stringify(this.movieDetails));
@@ -219,12 +233,27 @@
         }
       }
     },
-    activated() {
+    created() {
       this.generateProducerMap();
       this.generateActorMap();
     },
     components: {
-      multiselect: Multiselect
+      multiselect: Multiselect,
+      'person-details': PersonDetails
     }
   }
 </script>
+
+<style scoped>
+
+.entry-form {
+  max-width: 600px;
+  margin: auto;
+  margin-bottom: 20px;
+  padding: 30px;
+  padding-bottom: 0px;
+  border: 1px solid #888;
+  border-radius: 10px;
+}
+
+</style>

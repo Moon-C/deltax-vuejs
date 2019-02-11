@@ -67,7 +67,7 @@
 
   <p><b-link 
     href="#" 
-    @click="$emit('switchComponent', {name: 'movie-details'})"> 
+    @click="resetState()"> 
     Cancel 
   </b-link></p>
 
@@ -122,6 +122,15 @@
       },
     },
     methods: {
+      resetState: function() {
+        this.personDetails.name = '';
+        this.personDetails.sex = '';
+        this.personDetails.dob = '';
+        this.personDetails.bio = '';
+        this.personDetails.movies = [];
+        this.$v.$reset();
+        this.$root.$emit('bv::hide::modal','personDialog');
+      },
       submitRequest: function() {
 
         let json = JSON.parse(JSON.stringify(this.personDetails));
@@ -139,6 +148,7 @@
             }
             if(self.mode === 'new-actor')
               self.$emit('switchComponent', {name: 'movie-details', actorID: res.data.id});
+            self.resetState();
           });
         }
       }
@@ -159,14 +169,18 @@
         self.movieMap = movieMap;
       })
       .catch(error => console.log(error));
-    },
-    deactivated() {
-      this.personDetails.name = '';
-      this.personDetails.sex = '';
-      this.personDetails.dob = '';
-      this.personDetails.bio = '';
-      this.personDetails.movies = [];
-      this.$v.$reset();
     }
   }
 </script>
+
+<style scoped>
+
+.entry-form {
+  margin: auto;
+  padding: 30px;
+  padding-bottom: 0px;
+  border: 1px solid #888;
+  border-radius: 10px;
+}
+
+</style>
