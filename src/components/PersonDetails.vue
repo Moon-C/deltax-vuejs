@@ -177,6 +177,7 @@
 
 .entry-form {
   margin: auto;
+  margin-bottom: 0px;
   padding: 30px;
   padding-bottom: 0px;
   border: 1px solid #888;

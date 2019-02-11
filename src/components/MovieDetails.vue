@@ -243,17 +243,3 @@ import PersonDetails from '../components/PersonDetails.vue'
     }
   }
 </script>
-
-<style scoped>
-
-.entry-form {
-  max-width: 600px;
-  margin: auto;
-  margin-bottom: 20px;
-  padding: 30px;
-  padding-bottom: 0px;
-  border: 1px solid #888;
-  border-radius: 10px;
-}
-
-</style>

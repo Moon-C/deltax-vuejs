@@ -11,7 +11,6 @@
 
 <script>
 
-import axios from 'axios'
 import MovieDetails from '../components/MovieDetails.vue'
 
 export default {
@@ -47,6 +46,16 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style>
+
+.entry-form {
+  max-width: 600px;
+  margin: auto;
+  margin-bottom: 20px;
+  padding: 30px;
+  padding-bottom: 0px;
+  border: 1px solid #888;
+  border-radius: 10px;
+}
 
 .invalid-feedback {
   display: block !important;
