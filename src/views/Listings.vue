@@ -5,37 +5,30 @@
       {{ alertText }}
     </b-alert>
 
+    <b-modal id="movieDetailsDialog" :title="selectedMovie.name" :ok-only="true" footer-class="py-1" >
+      <b-container>
+        <b-row>
+          <b-col cols="4"><b-img thumbnail fluid :src="selectedMovie.poster" alt="Poster Unavailable" /></b-col>
+          <b-col cols="8">
+            <p class="mt-2">Release Date: {{ selectedMovie.yearOfRelease }}</p>
+            <p class="mt-2">Plot: {{ selectedMovie.plot }}</p>
+            <p class="mt-2">Producer: {{ selectedMovie.producer }}</p>
+            <p class="mt-2">Actors: {{ selectedMovie.actors.join(", ") }}</p>
+          </b-col>
+        </b-row>
+      </b-container>
+    </b-modal>
+
     <b-modal @ok="deleteMovie()" id="deleteDialog" title="Delete Confirmation" ok-title="Delete" footer-class="py-1" >
       <p class="mt-3">Remove '{{ deleteParameters.movieName }}' from listings?</p>
     </b-modal>
 
-    <!-- <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Movie Name</th>
-          <th scope="col">Release Date</th>
-          <th scope="col">Producer</th>
-          <th scope="col">Actors</th>
-          <th scope="col"> </th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        <tr v-for="(movie, index) in movies" :key="movie.id">
-          <td>{{ movie.name }}</td>
-          <td>{{ movie.yearOfRelease }}</td>
-          <td>{{ movie.producer }}</td>
-          <td>{{ movie.actors.join(", ") }}</td>
-          <td><small><router-link :to="{ name: 'editEntry', params: { id: movie.id } }">Edit</router-link> | 
-          <b-link v-b-modal.deleteDialog href="#" @click="setDeleteParameters(movie.id, index)">Delete</b-link></small></td>
-        </tr>
-      </tbody>
-    </table> -->
     <b-container>
       <b-list-group>
         <b-list-group-item v-for="(movie, index) in movies" :key="movie.id">
           <b-row>
-            <b-col sm="10">{{ movie.name }}</b-col>
+            <b-col sm="10">
+              <b-link v-b-modal.movieDetailsDialog href="#" @click="setSelectedMovie(movie)">{{ movie.name }}</b-link></b-col>
             <b-col sm="2"><small>
               <router-link :to="{ name: 'editEntry', params: { id: movie.id } }">Edit</router-link> | 
               <b-link v-b-modal.deleteDialog href="#" @click="setDeleteParameters(movie.id, index)">Delete</b-link>
@@ -63,6 +56,9 @@ export default {
         movieIndex: null,
         movieName: ''
       },
+      selectedMovie: {
+        actors: []
+      },
       movies: []
     }
   },
@@ -70,6 +66,9 @@ export default {
     hideAlert: function() {
       let self = this;
       setTimeout(() => self.showAlert = false, 5000);
+    },
+    setSelectedMovie: function(movie) {
+      this.selectedMovie = movie;
     },
     setDeleteParameters: function(movieID, movieIndex) {
       this.deleteParameters.movieID = movieID;
