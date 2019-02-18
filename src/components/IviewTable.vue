@@ -1,15 +1,27 @@
 <template>
     <div class="container">
-        <div class="row">
-            <CheckboxGroup v-model="selectedComparators"
-            :value="true"
-            @on-change="generateTable()">
-                <Checkbox v-for="comparator in comparatorTypes" 
-                :label="comparator"
-                :key="comparator" />
-            </CheckboxGroup>
+        <div class="row grey-wrapper">
+            <div class="col-sm-6">
+                <p>Selected columns</p>
+                <draggable class="list-group" v-model="selectedComparators"
+                :options="{ group: 'comparators' }"
+                @change="generateTable()">
+                    <div v-for="comparator in selectedComparators" 
+                    class="list-group-item"
+                    :key="comparator">{{ comparator }}</div>
+                </draggable>
+            </div>
+            <div class="col-sm-6">
+                <p>Add columns</p>
+                <draggable class="list-group" v-model="comparatorTypes"
+                :options="{ group: 'comparators' }">
+                    <div v-for="comparator in comparatorTypes" 
+                    :key="comparator"
+                    class="list-group-item">{{ comparator }}</div>
+                </draggable>
+            </div>
         </div>
-        <div class="row">
+        <div class="grey-wrapper">
             <Table :columns="iColumns" :data="iData" stripe border height="500"></Table>
         </div>
     </div>
@@ -17,10 +29,12 @@
 
 <script>
 
+import Draggable from 'vuedraggable'
+
 export default {
     data() {
         return {
-            comparatorTypes: ['First Interaction','Last Interaction','U-shaped'],
+            comparatorTypes: ['Last Interaction','U-shaped'],
             selectedComparators: ['First Interaction'],
             iColumns: [],
             iData: []
@@ -102,6 +116,9 @@ export default {
 
         }
     },
+    components: {
+        draggable: Draggable
+    },
     mounted () 
     {
         this.generateTable();
@@ -125,3 +142,15 @@ export default {
     }
 }
 </script>
+
+<style>
+
+.grey-wrapper {
+    background-color: #CCC;
+    margin: 10px;
+    border: 5px solid #CCC;
+    border-radius: 5px;
+}
+
+</style>
+
