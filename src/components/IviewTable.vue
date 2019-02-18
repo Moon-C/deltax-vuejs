@@ -28,6 +28,8 @@ export default {
     },
     methods: {
         generateTable() {
+
+            // Generating columns
             
             this.iColumns = [];
 
@@ -43,7 +45,6 @@ export default {
                 let column = {
                     title: comparator,
                     align: 'center',
-                    // className: 'hide-column',
                     children: [
                         {
                             title: 'Conversions',
@@ -78,7 +79,27 @@ export default {
 
             this.iColumns.push(percentChangeHeader);
 
-            
+            // Generating data
+
+            // const data = [];
+            // for (let i = 0; i < 20; i++) {
+
+            //     let item = {
+            //         key: i,
+            //         channelGrouping: 'Group '+(i+1),
+            //         firstInteraction: (i+1)+".0%"
+            //     };
+
+            //     this.selectedComparators.forEach(comparator => {
+            //         let prefix = comparator.split(" ").map(word => word[0]).join('').toLowerCase();
+            //         item[prefix+'Conversions'] = '$40';
+            //         item[prefix+'ConversionValue'] = 'US$ '+(i+1)+'00000';
+            //     });
+
+            //     data.push(item);
+            // }
+            // this.iData = data;
+
         }
     },
     mounted () 
@@ -94,18 +115,13 @@ export default {
                 liConversionValue: 'US$ '+(i+1)+'00000',
                 fiConversions: '$41',
                 fiConversionValue: 'US$ '+(i+2)+'00000',
+                uConversions: '$41',
+                uConversionValue: 'US$ '+(i+2)+'00000',
                 firstInteraction: (i+1)+".0%"
             });
         }
         this.iData = data;
+
     }
 }
 </script>
-
-<style>
-
-.hide-column {
-    display: none;
-}
-
-</style>
