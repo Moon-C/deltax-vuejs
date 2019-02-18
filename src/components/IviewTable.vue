@@ -22,7 +22,12 @@
             </div>
         </div>
         <div class="grey-wrapper">
-            <Table :columns="iColumns" :data="iData" stripe border height="500"></Table>
+            <Table :columns="iColumns" :data="iData" stripe border></Table>
+            <div style="margin: 10px;overflow: hidden">
+                <div style="float: right;">
+                    <Page :total="100" :current="1" @on-change="generateData($event)"></Page>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -114,6 +119,23 @@ export default {
             // }
             // this.iData = data;
 
+        },
+        generateData(page) {
+            const data = [];
+            for (let i = (page-1)*10; i < page*10; i++) {
+                data.push({
+                    key: i,
+                    channelGrouping: 'Group '+(i+1),
+                    liConversions: '$40',
+                    liConversionValue: 'US$ '+(i+1)+'00000',
+                    fiConversions: '$41',
+                    fiConversionValue: 'US$ '+(i+2)+'00000',
+                    uConversions: '$41',
+                    uConversionValue: 'US$ '+(i+2)+'00000',
+                    firstInteraction: (i+1)+".0%"
+                });
+            }
+            this.iData = data;
         }
     },
     components: {
@@ -122,22 +144,7 @@ export default {
     mounted () 
     {
         this.generateTable();
-
-        const data = [];
-        for (let i = 0; i < 20; i++) {
-            data.push({
-                key: i,
-                channelGrouping: 'Group '+(i+1),
-                liConversions: '$40',
-                liConversionValue: 'US$ '+(i+1)+'00000',
-                fiConversions: '$41',
-                fiConversionValue: 'US$ '+(i+2)+'00000',
-                uConversions: '$41',
-                uConversionValue: 'US$ '+(i+2)+'00000',
-                firstInteraction: (i+1)+".0%"
-            });
-        }
-        this.iData = data;
+        this.generateData(1);
 
     }
 }
