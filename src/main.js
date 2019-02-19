@@ -3,10 +3,11 @@ import router from './router'
 import App from './App.vue'
 import store from './store'
 import iView from 'iview'
+import locale from 'iview/dist/locale/en-US';
 import BootstrapVue from 'bootstrap-vue'
 import 'iview/dist/styles/iview.css'
 
-Vue.use(iView)
+Vue.use(iView, { locale })
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false

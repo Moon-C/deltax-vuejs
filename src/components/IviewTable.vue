@@ -1,9 +1,9 @@
 <template>
     <div class="container">
-        <div class="row grey-wrapper">
+        <div class="row">
             <div class="col-sm-6">
                 <p>Selected columns</p>
-                <draggable class="list-group" v-model="selectedComparators"
+                <draggable class="list-group grey-wrapper" v-model="selectedComparators"
                 :options="{ group: 'comparators' }"
                 @change="generateTable()">
                     <div v-for="comparator in selectedComparators" 
@@ -13,7 +13,7 @@
             </div>
             <div class="col-sm-6">
                 <p>Add columns</p>
-                <draggable class="list-group" v-model="comparatorTypes"
+                <draggable class="list-group grey-wrapper" v-model="comparatorTypes"
                 :options="{ group: 'comparators' }">
                     <div v-for="comparator in comparatorTypes" 
                     :key="comparator"
@@ -150,12 +150,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 .grey-wrapper {
-    background-color: #CCC;
     margin: 10px;
-    border: 5px solid #CCC;
+    padding: 10px;
+    border: 1px solid #CCC;
     border-radius: 5px;
 }
 
