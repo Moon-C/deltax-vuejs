@@ -49,14 +49,20 @@ export const modelTypes = [
     { key: 'us', name: 'U-shaped' }
 ];
 
-export const modelNameMap = {
-    'ft-conversion': 'Conversion',
-    'ft-revenue': 'Revenue',
-    'lt-conversion': 'Conversion',
-    'lt-revenue': 'Revenue',
-    'us-conversion': 'Conversion',
-    'us-revenue': 'Revenue'
-};
+export const modelChildren = {
+    'ft': {
+       'ft-conversion': 'Conversion',
+       'ft-revenue': 'Revenue'
+    },
+    'lt': {
+       'ft-conversion': 'Conversion',
+       'ft-revenue': 'Revenue'
+    },
+    'us': {
+       'ft-conversion': 'Conversion',
+       'ft-revenue': 'Revenue'
+    }
+}
 
 export default {
     data() {
@@ -90,18 +96,18 @@ export default {
 
             this.selectedModels.forEach(model => {
 
-                let childrenKeys = Object.keys(modelNameMap).filter(key => key.startsWith(model.key))
+                let childrenKeys = Object.keys(modelChildren[model.key]);
                 /* 
-                    Should filter keys associated with selected model
+                    Should return keys associated with selected model
                     Ex.: If First Touch (ft) is selected model,
                     childrenKeys should contain [ft-conversion, ft-revenue, ...]
                 */
 
                let childrenObjects = [];
-               childrenKeys.forEach(key => {
+               childrenKeys.forEach(childKey => {
                    let child = {};
-                   child['title'] = modelNameMap[key];
-                   child['key'] = key;
+                   child['title'] = modelChildren[model.key][childKey];
+                   child['key'] = childKey;
                    child['align'] = 'center';
                    child['sortable'] = true;
                    childrenObjects.push(child);
