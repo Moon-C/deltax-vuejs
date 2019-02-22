@@ -2,30 +2,36 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
-                <p>Selected columns</p>
-                <draggable class="list-group grey-wrapper" v-model="selectedComparators"
-                :options="{ group: 'comparators' }"
-                @change="generateTable()">
-                    <div v-for="comparator in selectedComparators" 
+                <p>Selected Models</p>
+                <draggable class="list-group grey-wrapper" 
+                v-model="selectedModels"
+                :options="{ group: 'models' }"
+                @change="refreshTable()">
+                    <div v-for="model in selectedModels" 
                     class="list-group-item"
-                    :key="comparator">{{ comparator }}</div>
+                    :key="model.key">{{ model.name }}</div>
                 </draggable>
             </div>
             <div class="col-sm-6">
-                <p>Add columns</p>
-                <draggable class="list-group grey-wrapper" v-model="comparatorTypes"
-                :options="{ group: 'comparators' }">
-                    <div v-for="comparator in comparatorTypes" 
-                    :key="comparator"
-                    class="list-group-item">{{ comparator }}</div>
+                <p>Available Models</p>
+                <draggable class="list-group grey-wrapper" 
+                v-model="availableModels"
+                :options="{ group: 'models' }">
+                    <div v-for="model in availableModels"
+                    class="list-group-item"
+                    :key="model.key">{{ model.name }}</div>
                 </draggable>
             </div>
         </div>
         <div class="grey-wrapper">
-            <Table :columns="iColumns" :data="iData" stripe border></Table>
+            <Table :columns="iColumns" :data="iData"
+            stripe border :loading="loading" ></Table>
             <div style="margin: 10px;overflow: hidden">
                 <div style="float: right;">
-                    <Page :total="100" :current="1" @on-change="generateData($event)"></Page>
+                    <Page 
+                    :total="totalData" 
+                    :current="1" 
+                    @on-change="generateData($event)"/>
                 </div>
             </div>
         </div>
@@ -35,107 +41,119 @@
 <script>
 
 import Draggable from 'vuedraggable'
+import axios from 'axios'
+
+export const modelTypes = [
+    { key: 'ft', name: 'First Touch' },
+    { key: 'lt', name: 'Last Touch' },
+    { key: 'us', name: 'U-shaped' }
+];
+
+export const modelNameMap = {
+    'ft-conversion': 'Conversion',
+    'ft-revenue': 'Revenue',
+    'lt-conversion': 'Conversion',
+    'lt-revenue': 'Revenue',
+    'us-conversion': 'Conversion',
+    'us-revenue': 'Revenue'
+};
 
 export default {
     data() {
         return {
-            comparatorTypes: ['Last Interaction','U-shaped'],
-            selectedComparators: ['First Interaction'],
+            availableModels: modelTypes,
+            selectedModels: [],
             iColumns: [],
-            iData: []
+            iData: [],
+            totalData: 0,
+            loading: true
         }
     },
     methods: {
-        generateTable() {
+        initializeSelectedModels() {
+            // First Touch (index 0) as default model selection on load
+            // Currently this causes issues on route change
+            this.selectedModels.push(this.availableModels[0])
+            this.availableModels.splice(0, 1);
+        },
+        generateHeaders() {
 
-            // Generating columns
-            
+            // Generate column heads based on models selected
             this.iColumns = [];
 
-            let channelGroupHeader = {
-                title: 'MCF Channel Grouping',
-                key: 'channelGrouping',
+            let channelGroups = {
+                title: 'Engine',
+                key: 'engine',
                 align: 'center',
             };
-            this.iColumns.push(channelGroupHeader);
+            this.iColumns.push(channelGroups);
 
-            this.selectedComparators.forEach(comparator => {
-                let prefix = comparator.split(" ").map(word => word[0]).join('').toLowerCase();
+            this.selectedModels.forEach(model => {
+
+                let childrenKeys = Object.keys(modelNameMap).filter(key => key.startsWith(model.key))
+                /* 
+                    Should filter keys associated with selected model
+                    Ex.: If First Touch (ft) is selected model,
+                    childrenKeys should contain [ft-conversion, ft-revenue, ...]
+                */
+
+               let childrenObjects = [];
+               childrenKeys.forEach(key => {
+                   let child = {};
+                   child['title'] = modelNameMap[key];
+                   child['key'] = key;
+                   child['align'] = 'center';
+                   child['sortable'] = true;
+                   childrenObjects.push(child);
+               });
+
                 let column = {
-                    title: comparator,
+                    title: model.name,
                     align: 'center',
-                    children: [
-                        {
-                            title: 'Conversions',
-                            key: prefix+'Conversions',
-                            align: 'center',
-                            sortable: true
-                        },
-                        {
-                            title: 'Conversion Value',
-                            key: prefix+'ConversionValue',
-                            align: 'center',
-                            sortable: true
-                        }
-                    ] 
+                    children: childrenObjects
                 }
                 this.iColumns.push(column);
             });
-
-            let percentChangeHeader = {
+            
+            // To be reworked for client side computation
+            let percentChange = {
                 title: '% change in conversions',
-                key: 'changeInConversions',
                 align: 'center',
                 children: [
                     {
                         title: 'First Interaction',
-                        key: 'firstInteraction',
+                        key: 'percentChange',
                         align: 'center',
                         sortable: true
                     }
                 ]
             };
-
-            this.iColumns.push(percentChangeHeader);
-
-            // Generating data
-
-            // const data = [];
-            // for (let i = 0; i < 20; i++) {
-
-            //     let item = {
-            //         key: i,
-            //         channelGrouping: 'Group '+(i+1),
-            //         firstInteraction: (i+1)+".0%"
-            //     };
-
-            //     this.selectedComparators.forEach(comparator => {
-            //         let prefix = comparator.split(" ").map(word => word[0]).join('').toLowerCase();
-            //         item[prefix+'Conversions'] = '$40';
-            //         item[prefix+'ConversionValue'] = 'US$ '+(i+1)+'00000';
-            //     });
-
-            //     data.push(item);
-            // }
-            // this.iData = data;
+            this.iColumns.push(percentChange);
 
         },
         generateData(page) {
-            const data = [];
-            for (let i = (page-1)*10; i < page*10; i++) {
-                data.push({
-                    key: i,
-                    channelGrouping: 'Group '+(i+1),
-                    liConversions: '$40',
-                    liConversionValue: 'US$ '+(i+1)+'00000',
-                    fiConversions: '$41',
-                    fiConversionValue: 'US$ '+(i+2)+'00000',
-                    uConversions: '$41',
-                    uConversionValue: 'US$ '+(i+2)+'00000',
-                    firstInteraction: (i+1)+".0%"
-                });
-            }
-            this.iData = data;
+            
+            this.loading = true;
+            axios.get('/data')
+            .then(res => {
+
+                const data = Object.values(res.data);
+
+                this.totalData = data.length;
+
+                let iData = []
+                for(let i = (page-1)*10; i < page*10 && i < data.length; i++) {
+                    iData.push(data[i]);
+                    iData[iData.length-1]['key'] = i;
+                }
+                this.iData = iData;
+                this.loading = false;
+            });
+
+        },
+        refreshTable() {
+            this.generateHeaders();
+            this.generateData(1);
         }
     },
     components: {
@@ -143,9 +161,8 @@ export default {
     },
     mounted () 
     {
-        this.generateTable();
-        this.generateData(1);
-
+        this.initializeSelectedModels();
+        this.refreshTable();
     }
 }
 </script>
