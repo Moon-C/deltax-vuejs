@@ -24,8 +24,10 @@
             </div>
         </div>
         <div class="grey-wrapper">
-            <Table :columns="iColumns" :data="iData"
-            stripe border :loading="loading" ></Table>
+            <Table
+            :columns="iColumns" :data="iData"
+            stripe border 
+            :loading="loading" />
             <div style="margin: 10px;overflow: hidden">
                 <div style="float: right;">
                     <Page 
@@ -44,10 +46,15 @@ import Draggable from 'vuedraggable'
 import axios from 'axios'
 
 export const modelTypes = [
-    { key: 'ft', name: 'First Touch' },
-    { key: 'lt', name: 'Last Touch' },
+    { key: 'ft', name: 'First Interaction' },
+    { key: 'lt', name: 'Last Interaction' },
     { key: 'us', name: 'U-shaped' }
 ];
+
+export const modelChildrenGeneral = {
+    'conversion': 'Conversion',
+    'revenue': 'Revenue'
+};
 
 export const modelChildren = {
     'ft': {
@@ -55,12 +62,12 @@ export const modelChildren = {
        'ft-revenue': 'Revenue'
     },
     'lt': {
-       'ft-conversion': 'Conversion',
-       'ft-revenue': 'Revenue'
+       'lt-conversion': 'Conversion',
+       'lt-revenue': 'Revenue'
     },
     'us': {
-       'ft-conversion': 'Conversion',
-       'ft-revenue': 'Revenue'
+       'us-conversion': 'Conversion',
+       'us-revenue': 'Revenue'
     }
 }
 
@@ -72,12 +79,16 @@ export default {
             iColumns: [],
             iData: [],
             totalData: 0,
-            loading: true
+            loading: true,
+            compareMethod: 'conversion'
         }
+    },
+    components: {
+        draggable: Draggable
     },
     methods: {
         initializeSelectedModels() {
-            // First Touch (index 0) as default model selection on load
+            // First Interaction (index 0) as default model selection on load
             // Currently this causes issues on route change
             this.selectedModels.push(this.availableModels[0])
             this.availableModels.splice(0, 1);
@@ -99,7 +110,7 @@ export default {
                 let childrenKeys = Object.keys(modelChildren[model.key]);
                 /* 
                     Should return keys associated with selected model
-                    Ex.: If First Touch (ft) is selected model,
+                    Ex.: If First Interaction (ft) is selected model,
                     childrenKeys should contain [ft-conversion, ft-revenue, ...]
                 */
 
@@ -121,20 +132,77 @@ export default {
                 this.iColumns.push(column);
             });
             
-            // To be reworked for client side computation
-            let percentChange = {
-                title: '% change in conversions',
-                align: 'center',
-                children: [
-                    {
-                        title: 'First Interaction',
-                        key: 'percentChange',
-                        align: 'center',
-                        sortable: true
-                    }
-                ]
-            };
-            this.iColumns.push(percentChange);
+            if(this.selectedModels.length > 1) {
+                let percentChange = {
+                    renderHeader: (h) => {
+                        return h('div', {
+                            style: {
+                                margin: '8px'
+                            }
+                        },
+                        [
+                            h('Dropdown', {
+                                props: {
+                                    trigger: 'click',
+                                    transfer: true
+                                },
+                                on: {
+                                    'on-click': (event) => {
+                                        this.compareMethod = event;
+                                        this.calculateChange();
+                                    }
+                                }
+                            },
+                            [
+                                h('Button',
+                                [   '% change in '+modelChildrenGeneral[this.compareMethod]+' ',
+                                    h('Icon', {
+                                        attrs: { type: 'ios-arrow-down' }
+                                    })
+                                ]),
+                                h('DropdownMenu', {
+                                    slot: 'list',
+                                    style: {
+                                        margin: '0px'
+                                    }
+                                },
+                                [
+                                    h('DropdownItem', {
+                                        props: { 
+                                            name: 'conversion'
+                                        }
+                                    }, 'Conversion'),
+                                    h('DropdownItem', {
+                                        props: { 
+                                            name: 'revenue'
+                                        }
+                                    }, 'Revenue')
+                                ])
+                            ]),
+                            h('div', {
+                                attrs: {
+                                    class: 'small'
+                                },
+                                style: {
+                                    margin: '5px'
+                                }
+                            }, '(from '+this.selectedModels[1].name+')')
+                        ])
+                    },
+                    align: 'center',
+                    minWidth: 200,
+                    children: [
+                        {
+                            title: this.selectedModels[0].name,
+                            key: 'percentChange',
+                            align: 'center',
+                            minWidth: 100,
+                            sortable: true
+                        }
+                    ]
+                };
+                this.iColumns.push(percentChange);
+            }
 
         },
         generateData(page) {
@@ -153,6 +221,7 @@ export default {
                     iData[iData.length-1]['key'] = i;
                 }
                 this.iData = iData;
+                this.calculateChange();
                 this.loading = false;
             });
 
@@ -160,10 +229,23 @@ export default {
         refreshTable() {
             this.generateHeaders();
             this.generateData(1);
+        },
+        calculateChange() {
+            
+            if(this.selectedModels.length > 1) {
+                let firstKey = this.selectedModels[0].key+'-'+this.compareMethod;
+                let secondKey = this.selectedModels[1].key+'-'+this.compareMethod;
+
+                for(let i = 0; i < this.iData.length; i++) {
+                    let numerator = this.iData[i][secondKey].substring(1);
+                    let denominator = this.iData[i][firstKey].substring(1);
+                    let result = ((numerator / denominator) * 100) - 100;
+                    result = Math.round((result + 0.00001) * 100) / 100
+                    
+                    this.iData[i].percentChange = result+'%';
+                }
+            }
         }
-    },
-    components: {
-        draggable: Draggable
     },
     mounted () 
     {
