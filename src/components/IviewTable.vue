@@ -186,14 +186,14 @@ export default {
                                 style: {
                                     margin: '5px'
                                 }
-                            }, '(from '+this.selectedModels[1].name+')')
+                            }, '(from '+this.selectedModels[0].name+')')
                         ])
                     },
                     align: 'center',
                     minWidth: 200,
                     children: [
                         {
-                            title: this.selectedModels[0].name,
+                            title: this.selectedModels[1].name,
                             key: 'percentChange',
                             align: 'center',
                             minWidth: 100,
@@ -237,8 +237,8 @@ export default {
                 let secondKey = this.selectedModels[1].key+'-'+this.compareMethod;
 
                 for(let i = 0; i < this.iData.length; i++) {
-                    let numerator = this.iData[i][secondKey].substring(1);
-                    let denominator = this.iData[i][firstKey].substring(1);
+                    let numerator = this.iData[i][secondKey];
+                    let denominator = this.iData[i][firstKey];
                     let result = ((numerator / denominator) * 100) - 100;
                     result = Math.round((result + 0.00001) * 100) / 100
                     
