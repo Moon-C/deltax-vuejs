@@ -74,7 +74,7 @@ export const modelChildren = {
 export default {
     data() {
         return {
-            availableModels: modelTypes,
+            availableModels: [],
             selectedModels: [],
             iColumns: [],
             iData: [],
@@ -89,8 +89,9 @@ export default {
     methods: {
         initializeSelectedModels() {
             // First Interaction (index 0) as default model selection on load
-            // Currently this causes issues on route change
-            this.selectedModels.push(this.availableModels[0])
+            // Assigning copy of modelTypes to availableModels
+            this.availableModels = JSON.parse(JSON.stringify(modelTypes));
+            this.selectedModels.push(this.availableModels[0]);
             this.availableModels.splice(0, 1);
         },
         generateHeaders() {
@@ -166,7 +167,7 @@ export default {
                         )
                     },
                     align: 'center',
-                    minWidth: 200,
+                    minWidth: 100,
                     children: [
                         {
                             title: this.selectedModels[1].name,
