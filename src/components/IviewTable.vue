@@ -134,60 +134,36 @@ export default {
             
             if(this.selectedModels.length > 1) {
                 let percentChange = {
-                    renderHeader: (h) => {
-                        return h('div', {
-                            style: {
-                                margin: '8px'
-                            }
-                        },
-                        [
-                            h('Dropdown', {
-                                props: {
-                                    trigger: 'click',
-                                    transfer: true
-                                },
-                                on: {
-                                    'on-click': (event) => {
+                    renderHeader: () => {
+                        return (
+                            /*
+                                JSX syntax for rendering % change header
+                                Requires Babel 6 and Vue 2+
+                                https://github.com/vuejs/babel-plugin-transform-vue-jsx
+                            */
+                            <div class="my-2">
+                                <Dropdown 
+                                trigger="click"
+                                onon-click={
+                                    (event) => {
                                         this.compareMethod = event;
                                         this.calculateChange();
                                     }
-                                }
-                            },
-                            [
-                                h('Button',
-                                [   '% change in '+modelChildrenGeneral[this.compareMethod]+' ',
-                                    h('Icon', {
-                                        attrs: { type: 'ios-arrow-down' }
-                                    })
-                                ]),
-                                h('DropdownMenu', {
-                                    slot: 'list',
-                                    style: {
-                                        margin: '0px'
-                                    }
-                                },
-                                [
-                                    h('DropdownItem', {
-                                        props: { 
-                                            name: 'conversion'
-                                        }
-                                    }, 'Conversion'),
-                                    h('DropdownItem', {
-                                        props: { 
-                                            name: 'revenue'
-                                        }
-                                    }, 'Revenue')
-                                ])
-                            ]),
-                            h('div', {
-                                attrs: {
-                                    class: 'small'
-                                },
-                                style: {
-                                    margin: '5px'
-                                }
-                            }, '(from '+this.selectedModels[0].name+')')
-                        ])
+                                }>
+                                    <Button>
+                                        % change in {modelChildrenGeneral[this.compareMethod]} 
+                                        <Icon type="ios-arrow-down"></Icon>
+                                    </Button>
+                                    <DropdownMenu slot="list" class="my-0">
+                                        <DropdownItem name="conversion">Conversion</DropdownItem>
+                                        <DropdownItem name="revenue">Revenue</DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                                <div class="small my-1">
+                                    (from {this.selectedModels[0].name})
+                                </div>
+                            </div>
+                        )
                     },
                     align: 'center',
                     minWidth: 200,
